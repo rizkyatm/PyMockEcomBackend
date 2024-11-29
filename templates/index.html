@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Produk</title>
+</head>
+<body>
+    <h1>Daftar Produk</h1>
+    <ul>
+        {% for product in products %}
+            <li>
+                <img src="{{ product.image }}" alt="Gambar Produk" width="100">
+                <h2>{{ product.name }}</h2>
+                <p>Harga: Rp{{ product.price }}</p>
+                <a href="{{ url_for('product', product_id=product.id) }}">Lihat Detail</a>
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{{ url_for('cart') }}">Lihat Cart</a>
+</body>
+</html>

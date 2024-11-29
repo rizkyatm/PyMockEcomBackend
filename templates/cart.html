@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keranjang Belanja</title>
+</head>
+<body>
+    <h1>Keranjang Belanja</h1>
+
+    {% if cart %}
+        <ul>
+            {% for item in cart %}
+                <li>
+                    {{ item.name }} - Rp{{ item.price }} x {{ item.quantity }} = Rp{{ item.price * item.quantity }}
+                    <a href="{{ url_for('remove_from_cart', product_id=item.id) }}">Hapus</a>
+                </li>
+            {% endfor %}
+        </ul>
+        <p>Total: Rp{{ total }}</p>
+        <a href="{{ url_for('checkout') }}">Checkout</a>
+    {% else %}
+        <p>Keranjang Anda kosong!</p>
+    {% endif %}
+
+    <br>
+    <a href="{{ url_for('index') }}">Kembali ke Daftar Produk</a>
+</body>
+</html>

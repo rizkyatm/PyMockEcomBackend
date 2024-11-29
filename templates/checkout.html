@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+    <script>
+        function updateTotal() {
+            // Ambil nilai dari form
+            const subtotal = parseFloat(document.getElementById('subtotal').dataset.value); // Subtotal dari server
+            const voucherSelect = document.getElementById('voucher'); // Elemen dropdown voucher
+            const shippingCost = parseFloat(document.getElementById('shipping').value); // Ongkir
+
+            // Reset semua opsi diskon
+            Array.from(voucherSelect.options).forEach(option => {
+                const minPurchase = parseFloat(option.dataset.minPurchase || 0); // Ambil syarat minimum pembelian
+                option.disabled = subtotal < minPurchase; // Nonaktifkan jika subtotal tidak mencukupi
+            });
+
+            // Hitung diskon
+            const selectedVoucher = parseFloat(voucherSelect.value); // Diskon dalam persen
+            let discount = 0;
+            if (selectedVoucher > 0 && !voucherSelect.options[voucherSelect.selectedIndex].disabled) {
+                discount = subtotal * (selectedVoucher / 100);
+            }
+
+            // Hitung total akhir
+            const finalPrice = subtotal - discount + shippingCost;
+
+            // Perbarui tampilan diskon, ongkir, dan harga akhir
+            document.getElementById('discount').innerText = `Rp${discount.toFixed(0)}`;
+            document.getElementById('shipping_cost').innerText = `Rp${shippingCost.toFixed(0)}`;
+            document.getElementById('final_price').innerText = `Rp${finalPrice.toFixed(0)}`;
+        }
+
+        // Panggil updateTotal di awal untuk memastikan dropdown sudah diperbarui
+        window.onload = updateTotal;
+    </script>
+</head>
+<body>
+    <h1>Checkout</h1>
+    
+    <!-- Daftar Produk yang Akan di-Checkout -->
+    <h2>Produk yang Anda Beli:</h2>
+    <ul>
+        {% for item in cart %}
+            <li>
+                {{ item.name }} - Rp{{ item.price }} x {{ item.quantity }} = Rp{{ item.price * item.quantity }}
+            </li>
+        {% endfor %}
+    </ul>
+    <p><strong>Subtotal: <span id="subtotal" data-value="{{ total }}">Rp{{ total }}</span></strong></p>
+    <p>Diskon: <span id="discount">Rp0</span></p>
+    <p>Ongkos Kirim: <span id="shipping_cost">-</span></p>
+    <p><strong>Total Akhir: <span id="final_price">Rp{{ total }}</span></strong></p>
+    
+    <!-- Form Checkout -->
+    <form method="POST" action="{{ url_for('checkout') }}">
+        <!-- Data Diri -->
+        <label for="name">Nama:</label>
+        <input type="text" id="name" name="name" required><br>
+        
+        <label for="address">Alamat:</label>
+        <textarea id="address" name="address" required></textarea><br>
+        
+        <label for="phone">Nomor Telepon:</label>
+        <input type="text" id="phone" name="phone" required><br>
+        
+        <!-- Pilihan Voucher -->
+        <label for="voucher">Pilih Diskon:</label>
+        <select id="voucher" name="voucher" onchange="updateTotal()">
+            <option value="0" data-min-purchase="0">Tidak ada diskon</option>
+            <option value="5" data-min-purchase="100000">Diskon 5% (min. Rp100.000)</option>
+            <option value="10" data-min-purchase="200000">Diskon 10% (min. Rp200.000)</option>
+            <option value="15" data-min-purchase="300000">Diskon 15% (min. Rp300.000)</option>
+        </select>
+        
+        
+        <!-- Pilihan Ongkos Kirim -->
+        <h3>Pilih Ongkir:</h3>
+        <select name="shipping" id="shipping" onchange="updateTotal()">
+            <option value="8000">Hemat (Rp8.000)</option>
+            <option value="10000">Reguler (Rp10.000)</option>
+            <option value="12000">Cepat (Rp12.000)</option>
+        </select><br>
+        
+        <button type="submit">Proses Checkout</button>
+    </form>
+    
+    <br>
+    <a href="{{ url_for('cart') }}">Kembali ke Keranjang</a>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout</title>
+</head>
+<body>
+    <h1>Checkout</h1>
+    
+    <!-- Daftar Produk yang Akan di-Checkout -->
+    <h2>Produk yang Anda Beli:</h2>
+    <ul>
+        {% for item in cart %}
+            <li>
+                {{ item.name }} - Rp{{ item.price }} x {{ item.quantity }} = Rp{{ item.price * item.quantity }}
+            </li>
+        {% endfor %}
+    </ul>
+    <p><strong>Total: Rp{{ total }}</strong></p>
+    
+    <!-- Form Checkout -->
+    <form method="POST" action="{{ url_for('checkout') }}">
+        <!-- Data Diri -->
+        <label for="name">Nama:</label>
+        <input type="text" id="name" name="name" required><br>
+        
+        <label for="address">Alamat:</label>
+        <textarea id="address" name="address" required></textarea><br>
+        
+        <label for="phone">Nomor Telepon:</label>
+        <input type="text" id="phone" name="phone" required><br>
+        
+        <!-- Pilihan Voucher -->
+        <h3>Pilih Voucher:</h3>
+        <select name="voucher" id="voucher">
+            <option value="0">Tanpa Voucher</option>
+            <option value="5">Diskon 5% (Belanja di atas Rp100.000)</option>
+            <option value="10">Diskon 10% (Belanja di atas Rp200.000)</option>
+            <option value="15">Diskon 15% (Belanja di atas Rp300.000)</option>
+        </select><br>
+        
+        <!-- Pilihan Ongkos Kirim -->
+        <h3>Pilih Ongkir:</h3>
+        <select name="shipping" id="shipping">
+            <option value="8000">Hemat (Rp8.000)</option>
+            <option value="10000">Reguler (Rp10.000)</option>
+            <option value="12000">Cepat (Rp12.000)</option>
+        </select><br>
+        
+        <button type="submit">Proses Checkout</button>
+    </form>
+    
+    <br>
+    <a href="{{ url_for('cart') }}">Kembali ke Keranjang</a>
+</body>
+</html>
